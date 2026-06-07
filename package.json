@@ -1,0 +1,19 @@
+{
+  "name": "discordbot-horoscope",
+  "version": "1.0.0",
+  "description": "Discord bot with a daily zodiac horoscope command",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "register": "node src/register-commands.js",
+    "check": "node --check src/index.js && node --check src/register-commands.js && node --check src/fortune.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "discord.js": "^14.21.0",
+    "dotenv": "^16.6.1"
+  }
+}
