@@ -69,9 +69,10 @@ DISCORD_GUILD_ID=your_test_guild_id
 ```
 
 4. Deploy を実行
-5. 初回またはコマンド変更時だけ、Railway の Shell かローカルで `npm run register` を実行
+5. デプロイ時に `npm run register` が自動実行されます
+6. もし登録に失敗した場合は、Railway の Deploy Logs で `preDeployCommand` の結果を確認
 
-リポジトリには `railway.json` を入れているので、Railway は `npm start` で Bot を起動します。
+リポジトリには `railway.json` を入れているので、Railway はデプロイ前に `npm run register` を実行し、その後 `npm start` で Bot を起動します。
 
 ## 使い方
 
