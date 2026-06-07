@@ -78,23 +78,38 @@ const ADVICE = [
 const OMIKUJI_RESULTS = [
   {
     name: "大吉",
-    description: "追い風の強い日です。迷ったら前向きな方を選ぶと流れに乗れます。"
+    description: "追い風の強い日です。迷ったら前向きな方を選ぶと流れに乗れます。",
+    weight: 3
   },
   {
     name: "中吉",
-    description: "安定した運気です。丁寧に進めるほど良さが積み上がります。"
+    description: "安定した運気です。丁寧に進めるほど良さが積み上がります。",
+    weight: 17
   },
   {
     name: "小吉",
-    description: "小さな幸運が見つかる日です。見落としていたチャンスに注目です。"
+    description: "小さな幸運が見つかる日です。見落としていたチャンスに注目です。",
+    weight: 20
   },
   {
     name: "吉",
-    description: "堅実さが光ります。無理をしない選択が良い結果につながります。"
+    description: "堅実さが光ります。無理をしない選択が良い結果につながります。",
+    weight: 30
   },
   {
     name: "末吉",
-    description: "後半から流れが上向きます。朝はゆっくり整えると吉です。"
+    description: "後半から流れが上向きます。朝はゆっくり整えると吉です。",
+    weight: 20
+  },
+  {
+    name: "凶",
+    description: "慎重さが助けになる日です。急がず整えるほど流れを戻せます。",
+    weight: 8
+  },
+  {
+    name: "大凶",
+    description: "無理を減らして守りを固めたい日です。今日は休む判断も立派な正解です。",
+    weight: 2
   }
 ];
 
@@ -177,6 +192,21 @@ function pickFrom(list, seed, offset = 0) {
   return list[(seed + offset) % list.length];
 }
 
+function pickWeighted(list, seed) {
+  const totalWeight = list.reduce((sum, item) => sum + item.weight, 0);
+  let cursor = seed % totalWeight;
+
+  for (const item of list) {
+    if (cursor < item.weight) {
+      return item;
+    }
+
+    cursor -= item.weight;
+  }
+
+  return list[list.length - 1];
+}
+
 function score(seed, offset = 0) {
   return 1 + ((seed + offset) % 5);
 }
@@ -223,7 +253,7 @@ export function buildHoroscope(sign, date = new Date()) {
 export function buildOmikuji(date = new Date()) {
   const dateKey = dateKeyOf(date);
   const seed = hashToNumber(`${dateKey}:omikuji`);
-  const result = pickFrom(OMIKUJI_RESULTS, seed);
+  const result = pickWeighted(OMIKUJI_RESULTS, seed);
 
   return {
     dateKey,
