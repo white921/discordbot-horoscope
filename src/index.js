@@ -1,6 +1,8 @@
 import "dotenv/config";
 import {
   ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
   Client,
   EmbedBuilder,
   Events,
@@ -131,29 +133,42 @@ function buildFlowerFortuneEmbed(flower) {
     });
 }
 
-function buildFortuneTypePanel() {
-  const menu = new StringSelectMenuBuilder()
-    .setCustomId(FORTUNE_TYPE_PANEL_ID)
-    .setPlaceholder("遊びたい占いを選ぶ")
-    .addOptions([
+function buildFortuneTypeIntroEmbed() {
+  return new EmbedBuilder()
+    .setColor(0x5865f2)
+    .setTitle("今日の占いを選ぼう")
+    .setDescription("気になる占いをひとつ選ぶと、次のメニューや結果を表示します。")
+    .addFields(
       {
-        label: "星座占い",
-        value: "horoscope",
-        description: "12星座から選んで今日の運勢を見る"
+        name: "星座占い",
+        value: "12星座から選んで、総合運や恋愛運、仕事運をバランスよく見られます。"
       },
       {
-        label: "おみくじ",
-        value: "omikuji",
-        description: "今日の運勢をさっと引く"
+        name: "おみくじ",
+        value: "すぐに結果を引きたいとき向けです。今日の流れを手軽にチェックできます。"
       },
       {
-        label: "花占い",
-        value: "flower",
-        description: "好きな花を選んで恋や気分の流れを見る"
+        name: "花占い",
+        value: "好きな花を選んで、気分や恋の流れをやわらかい雰囲気で楽しめます。"
       }
-    ]);
+    );
+}
 
-  return new ActionRowBuilder().addComponents(menu);
+function buildFortuneTypePanel() {
+  return new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`${FORTUNE_TYPE_PANEL_ID}:horoscope`)
+      .setLabel("星座占い")
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId(`${FORTUNE_TYPE_PANEL_ID}:omikuji`)
+      .setLabel("おみくじ")
+      .setStyle(ButtonStyle.Success),
+    new ButtonBuilder()
+      .setCustomId(`${FORTUNE_TYPE_PANEL_ID}:flower`)
+      .setLabel("花占い")
+      .setStyle(ButtonStyle.Secondary)
+  );
 }
 
 function buildHoroscopePanel() {
@@ -194,7 +209,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     if (interaction.commandName === "uranai-panel") {
       await interaction.reply({
-        content: "遊びたい占いを選ぶと、次のメニューや結果を表示します。",
+        embeds: [buildFortuneTypeIntroEmbed()],
         components: [buildFortuneTypePanel()]
       });
     }
@@ -202,38 +217,38 @@ client.on(Events.InteractionCreate, async (interaction) => {
     return;
   }
 
-  if (interaction.isStringSelectMenu()) {
-    if (interaction.customId === FORTUNE_TYPE_PANEL_ID) {
-      const selectedType = interaction.values[0];
+  if (interaction.isButton() && interaction.customId.startsWith(`${FORTUNE_TYPE_PANEL_ID}:`)) {
+    const selectedType = interaction.customId.split(":")[1];
 
-      if (selectedType === "horoscope") {
-        await interaction.reply({
-          content: "星座を選ぶと、あなただけに結果を表示します。",
-          components: [buildHoroscopePanel()],
-          ephemeral: true
-        });
-        return;
-      }
-
-      if (selectedType === "omikuji") {
-        await interaction.reply({
-          embeds: [buildOmikujiEmbed()],
-          ephemeral: true
-        });
-        return;
-      }
-
-      if (selectedType === "flower") {
-        await interaction.reply({
-          content: "花を選ぶと、あなただけに結果を表示します。",
-          components: [buildFlowerPanel()],
-          ephemeral: true
-        });
-      }
-
+    if (selectedType === "horoscope") {
+      await interaction.reply({
+        content: "星座を選ぶと、あなただけに結果を表示します。",
+        components: [buildHoroscopePanel()],
+        ephemeral: true
+      });
       return;
     }
 
+    if (selectedType === "omikuji") {
+      await interaction.reply({
+        embeds: [buildOmikujiEmbed()],
+        ephemeral: true
+      });
+      return;
+    }
+
+    if (selectedType === "flower") {
+      await interaction.reply({
+        content: "花を選ぶと、あなただけに結果を表示します。",
+        components: [buildFlowerPanel()],
+        ephemeral: true
+      });
+    }
+
+    return;
+  }
+
+  if (interaction.isStringSelectMenu()) {
     if (interaction.customId === HOROSCOPE_PANEL_ID) {
       const sign = interaction.values[0];
       await interaction.reply({
