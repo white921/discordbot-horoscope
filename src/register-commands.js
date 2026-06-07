@@ -28,7 +28,7 @@ const commands = [
     ),
   new SlashCommandBuilder()
     .setName("uranai-panel")
-    .setDescription("星座占いパネルをこのチャンネルに投稿します")
+    .setDescription("星座占い・おみくじ・花占いのパネルをこのチャンネルに投稿します")
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
 ].map((command) => command.toJSON());
 
